@@ -69,7 +69,7 @@ backup_folder = Path(userPaths['backupFolder'])
 versionFolder = backup_folder / versionFolderName
 
 # Check if backup already has files (previous run)
-if any(backup_folder.iterdir()):
+if backup_folder.exists() and any(backup_folder.iterdir()):
     print("Duplicates found. Creating version backup.")
     versionFolder.mkdir(parents=True, exist_ok=True)
     versionBackup(userPaths['backupFolder'], versionFolder)
