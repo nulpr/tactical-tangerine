@@ -1,94 +1,128 @@
-# Tactical Tangerine
-A simple Python utility that backups and organizes files and folders to another location locally.
+# Tactical Tangerine 🍊
 
-# Features
-- Configurable JSON file with source path and the backup folder path compatible with Windows and Linux. (not tested in MacOS)
+A lightweight Python utility for backing up and organizing files to another local destination, with extension-based sorting and simple JSON configuration.
 
-- Extension based file sorting
+> ⚠️ **Warning:** Bugs may still exist. Always keep important data backed up in a secure, separate location. The author is not responsible for lost or overwritten files — use at your own risk.
 
-- Multiple folders of interest to backup (FUTURE)
+---
 
-# Installation
+## Table of Contents
+
+- [Features](#features)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Usage](#usage)
+- [File Sorting](#file-sorting)
+- [Known Limitations](#known-limitations)
+- [To-Do](#to-do)
+
+---
+
+## Features
+
+- Simple JSON-based configuration with support for **Windows** and **Linux** paths *(macOS untested)*
+- Extension-based automatic file sorting
+- Automatic config file generation on first run
+
+---
 
 ## Requirements
 
-- Python 3.14.X
+- Python 3.14+
+- Standard library only — no external dependencies:
+  - `shutil`
+  - `os`
+  - `pathlib`
+  - `json`
 
-- Standard library modules used:
+---
 
-- shutil
+## Installation
 
-- os
+Clone the repository and run the script:
 
-- pathlib
-
-- json
-
-Clone the repo with:
 ```bash
-
 git clone https://github.com/nulpr/tactical-tangerine.git
-
 cd tactical-tangerine
-
 python main.py
-
 ```
+
+---
+
 ## Configuration
 
-Inside the repo folder you can find the file `config.json`. Opening it, you should see something like:
+Tactical Tangerine uses a `config.json` file to define the source and backup folder paths.
+
+### Automatic setup
+
+On the first run, the program will automatically create `config.json` and prompt you to enter the required paths. On subsequent runs, it will detect the existing file and use it directly.
+
+> If you encounter errors related to the config file, check that the path values are not empty strings.
+
+### Manual setup
+
+If the config file is not created automatically, you can create it manually. It must follow this format:
 
 ```json
-
 {
-
-"sourceFolder": "/path/to/source",
-
-"backupFolder": "/path/to/backup"
-
+  "sourceFolder": "/path/to/source",
+  "backupFolder": "/path/to/backup"
 }
-
 ```
 
-That's your config file. Make sure to put a valid path with permission to write, otherwise it's gonna rise a permission error.
+Make sure the paths point to locations where you have **write permissions**, otherwise a permission error will be raised.
 
-# Usage
+### Path format by OS
 
-## JSON File
-When running for the first time, the JSON file should be automatically created and asked for a path for each destination only once since the program checks if the file exists each time you run it. If the file exists it'll assume it holds a valid path. If you encounter any error with the config file, make sure to check if the quotes aren't empty.  
+| OS      | Separator | Example                        |
+|---------|-----------|--------------------------------|
+| Linux   | `/`       | `/home/user/documents`         |
+| Windows | `\\`      | `C:\\Users\\user\\documents`   |
 
-In case the config file is not automatically created, you can always create it manually as long as it's in the right format.
+### Custom config location
 
-You can also choose a different folder to place the config file. For that, you're gonna have to go to the ```main.py``` file and look for the line that looks like this:
+By default, the config file is expected in the current working directory. To change this, open `main.py` and modify the following line:
+
 ```python
-
 mainFolder = Path('.')
-
 ```
 
-Modify it to the desired path where you wish to hold your config and you're ready to go. Just a reminder, it checks each file until it finds one called ```config.json```, so be aware to avoid any conflicts with an existing file.
+Replace `Path('.')` with your desired directory path. Note that the program scans for a file named exactly `config.json`, so avoid naming conflicts with existing files in that location.
+
+---
+
+## Usage
+
+After configuring your paths, simply run:
+
+```bash
+python main.py
+```
+
+The program will copy and organize files from your source folder into the backup folder.
+
+---
 
 ## File Sorting
-Inside the main folder, there's a file called ```organizer.py```. There you can find the whole sorting logic, so if you happen to notice a certain extension you work with is not being properly sorted, you'll want to go the file and add your desired extension to the list.
 
-# Known Limitations
+File sorting logic is defined in `organizer.py`. Files are categorized and moved into subfolders based on their extension.
+
+If an extension you work with is not being sorted correctly, open `organizer.py` and add the extension to the appropriate list.
+
+---
+
+## Known Limitations
 
 - No GUI
+- Limited error handling
+- No background or scheduled running
 
-- Few error handlers
+---
 
-- No version control
+## To-Do
 
-- No background running
-
-# Warning
-Bugs exist, so always backup important data in a secure place. Even though work is being done to unsure nothing is lost or overwriten, it can still happen. Take your own risk
-
-# To-Do
-- [ ] Multiple folders of interest
-
-- [ ] Background running
-
-- [x] Version control
-
+- [ ] Multiple source folders support
+- [ ] Background running / scheduled backups
 - [ ] Frequency control
+- [x] Version control

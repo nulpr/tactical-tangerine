@@ -1,5 +1,5 @@
 from pathlib import Path
-import os   # I'm gonna use this to navigate because I don't know how to use pathlib :)
+import os
 import shutil
 import json
 from organizer import filesOrganizer
@@ -7,8 +7,8 @@ import datetime
 
 configFile = 'config.json'
 config = Path(configFile)
-userPaths = {'sourceFolder': '',
-             'backupFolder' : ''}
+
+userPaths = {'sourceFolder': '', 'backupFolder' : ''}
 mainFolder = Path('.')
 versionFolderName = datetime.datetime.now().strftime('%Y-%m-%d')
 
@@ -52,20 +52,77 @@ def versionBackup(backup, version_dest):
         else:
             shutil.copy2(source_path, dest_path)
 
-#   Checking if config file exists
-if config.exists():
-    with open("config.json", 'r') as f:
-        userPaths = json.load(f)
-elif not config.exists():
-    source = input('Source folder path: ')
-    dest = input('Backup folder path: ')
-    userPaths['sourceFolder'] = source
-    userPaths['backupFolder'] = dest
-    writeConfig()
-else:
-    print("idk what's happening, sorry")
+def pathFixer():
+    global userPaths
+    while True:
+        linuxBackslash = "/"
+        windowsBackslash = "//"
 
+        if config.exists():
+            with open("config.json", 'r') as f:
+                userPaths = json.load(f)
+
+            # Look at one of the saved paths to guess the OS
+            saved_path = userPaths.get('sourceFolder', '')
+
+            if "\\" in saved_path:
+                print("Config found. Windows path detected")
+            elif "/" in saved_path:
+                print("Config found. Linux path detected")
+            else:
+                print("Config found, but paths look generic.")
+            break
+
+        elif not config.exists():
+            print("Config not found. Creating one")
+            print("What's your Operating System?")
+            print("1. Linux")
+            print("2. Windows")
+
+            while True:
+                try:
+                    OS = input("Enter a number: ")
+                    OS = int(OS)
+                    if OS in [1, 2]:
+                        break
+                    else:
+                        print("Make sure to select a valid option")
+                except ValueError:
+                    print("Make sure to choose a number")
+
+            source = input('Source folder path: ')
+            dest = input('Backup folder path: ')
+
+            userPaths['sourceFolder'] = source
+            userPaths['backupFolder'] = dest
+
+            if OS == 1:
+                print("Linux selected")
+                userPaths['sourceFolder'] = source
+                userPaths['backupFolder'] = dest
+                writeConfig()
+                break
+
+            elif OS == 2:
+                print("Windows selected")
+
+                source = source.replace("/", "\\")
+                dest = dest.replace("/", "\\")
+                
+                # Update the dictionary with our fixed strings
+                userPaths['sourceFolder'] = source
+                userPaths['backupFolder'] = dest
+                
+                writeConfig()
+                break
+        else:
+            print("idk what's happening, sorry")
+
+pathFixer()
+
+# The rest of your script remains untouched...
 backup_folder = Path(userPaths['backupFolder'])
+# ...
 versionFolder = backup_folder / versionFolderName
 
 # Check if backup already has files (previous run)
